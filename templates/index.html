@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gate Entry Request - Approval System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 550px;
+            width: 100%;
+            padding: 40px 25px;
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #f0f0f0;
+        }
+        
+        .logo-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            color: #999;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .form-group {
+            margin-bottom: 22px;
+        }
+        
+        .form-group.required label::after {
+            content: " *";
+            color: #ff4444;
+            font-weight: bold;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+            background: white;
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: #bbb;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+        
+        select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 20px;
+            padding-right: 40px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(-1px);
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 25px 15px;
+                border-radius: 8px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+                margin-bottom: 6px;
+            }
+            
+            .header p {
+                font-size: 12px;
+            }
+            
+            .form-group {
+                margin-bottom: 15px;
+            }
+            
+            label {
+                font-size: 12px;
+                margin-bottom: 7px;
+            }
+            
+            input, select, textarea {
+                padding: 12px;
+                font-size: 16px;
+            }
+            
+            button {
+                padding: 12px;
+                font-size: 15px;
+            }
+            
+            .info {
+                padding: 10px !important;
+                font-size: 12px !important;
+            }
+            
+            .success, .error {
+                padding: 12px !important;
+                font-size: 12px !important;
+            }
+        }
+        
+        .success {
+            display: none;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 2px solid #28a745;
+            color: #155724;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: slideDown 0.4s ease;
+            font-weight: 600;
+        }
+        
+        .error {
+            display: none;
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border: 2px solid #dc3545;
+            color: #721c24;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: slideDown 0.4s ease;
+            font-weight: 600;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .info {
+            background: linear-gradient(135deg, #e7f3ff 0%, #cce5ff 100%);
+            border-left: 5px solid #2196F3;
+            padding: 14px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            color: #0c5aa0;
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+        
+        .links {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .links a {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .links a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .links a.secondary {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        }
+
+        .links a.secondary:hover {
+            box-shadow: 0 8px 20px rgba(23, 162, 184, 0.4);
+        }
+
+        .success-details {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 4px solid #28a745;
+            display: none;
+            animation: slideUp 0.6s ease;
+        }
+
+        .success-details.show {
+            display: block;
+        }
+
+        .request-id-display {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            color: #667eea;
+            word-break: break-all;
+            margin-top: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .request-id-display:hover {
+            background: #f0f3ff;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Camera Section Styles */
+        .camera-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+            color: white;
+            animation: slideUp 0.6s ease;
+        }
+
+        .camera-section label {
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .camera-section h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .camera-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #camera-video {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #000;
+            border-radius: 10px;
+        }
+
+        #camera-canvas {
+            display: none;
+        }
+
+        .camera-photo {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            border-radius: 12px;
+            margin: 15px auto;
+            display: block;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.6s ease;
+            border: 3px solid #667eea;
+        }
+
+        .camera-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .camera-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .camera-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .camera-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .camera-btn.danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .camera-status {
+            text-align: center;
+            font-size: 13px;
+            margin-top: 12px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .camera-status.success {
+            color: #28a745;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .photo-preview {
+            position: relative;
+            display: inline-block;
+            margin: 10px auto;
+            width: 100%;
+        }
+
+        .photo-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .photo-remove:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+        
+        @media (max-width: 480px) {
+            .camera-section {
+                padding: 15px;
+            }
+
+            .camera-buttons {
+                flex-direction: column;
+            }
+
+            .camera-btn {
+                min-width: auto;
+            }
+
+            .links {
+                margin-top: 15px;
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .links a {
+                margin: 0;
+                display: block;
+                text-align: center;
+                padding: 11px 20px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-icon">🚪</div>
+            <h1>Gate Entry System</h1>
+            <p>Secure Access Request Portal</p>
+        </div>
+        
+        <div class="success" id="successMessage">
+            ✅ <strong>Request Sent Successfully!</strong> 
+            <div class="success-details show">
+                <p>Your request ID: <span class="request-id-display" id="requestIdDisplay" title="Click to copy"></span></p>
+                <p style="margin-top: 10px; font-size: 12px;">Save this ID to check your request status anytime.</p>
+            </div>
+        </div>
+        
+        <div class="error" id="errorMessage"></div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Sending request...</p>
+        </div>
+        
+        <form id="accessForm" style="display: none;">
+            <div class="info">
+                📧 <strong>How it works:</strong> An approval email will be sent to the selected approver. They can approve or reject your request with one click.
+            </div>
+            
+            <div class="form-group">
+                <label for="visitor_name">Your Name *</label>
+                <input type="text" id="visitor_name" name="visitor_name" placeholder="Enter your full name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="visitor_email">Your Email *</label>
+                <input type="email" id="visitor_email" name="visitor_email" placeholder="your.email@company.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="reason">Reason for Visit *</label>
+                <textarea id="reason" name="reason" placeholder="e.g., Meeting with management, Project discussion" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="approver_name">Select Approver *</label>
+                <select id="approver_name" name="approver_name" required>
+                    <option value="">-- Choose an approver --</option>
+                    {% for approver in approvers %}
+                    <option value="{{ approver }}">{{ approver }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Camera Capture Section -->
+            <div class="camera-section">
+                <h3>📸 Capture Your Photo</h3>
+                <p style="margin-bottom: 15px; opacity: 0.95;">Please take a photo for identification purposes</p>
+                
+                <div class="camera-container">
+                    <video id="camera-video" autoplay playsinline></video>
+                    <canvas id="camera-canvas"></canvas>
+                </div>
+
+                <div class="camera-buttons">
+                    <button type="button" class="camera-btn" id="startCameraBtn" onclick="startCamera()">
+                        ▶️ Start Camera
+                    </button>
+                    <button type="button" class="camera-btn" id="captureCameraBtn" onclick="capturePhoto()" disabled>
+                        📷 Capture
+                    </button>
+                    <button type="button" class="camera-btn danger" id="stopCameraBtn" onclick="stopCamera()" disabled>
+                        ⏹️ Stop
+                    </button>
+                </div>
+
+                <div class="camera-status" id="camera-status"></div>
+
+                <div id="photo-preview" style="display: none;">
+                    <img id="captured-photo" class="camera-photo" alt="Captured Photo">
+                    <button type="button" class="photo-remove" onclick="removePhoto()">✕</button>
+                </div>
+            </div>
+
+            <button type="submit">📧 Send Approval Request</button>
+        </form>
+        
+        <div class="links">
+            <a href="/check-status-page" class="secondary">🔍 Check Status</a>
+            <a href="/dashboard">📊 View Dashboard</a>
+        </div>
+    </div>
+    
+    <script>
+        // Global variables for camera
+        let stream = null;
+        let capturedPhotoData = null;
+
+        const form = document.getElementById('accessForm');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const loading = document.getElementById('loading');
+        const requestIdDisplay = document.getElementById('requestIdDisplay');
+        
+        // Show form after page loads
+        window.addEventListener('load', () => {
+            form.style.display = 'block';
+        });
+
+        // Camera Functions
+        async function startCamera() {
+            try {
+                const statusEl = document.getElementById('camera-status');
+                statusEl.textContent = '⏳ Initializing camera...';
+                statusEl.className = '';
+
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'user' } 
+                });
+                
+                const video = document.getElementById('camera-video');
+                video.srcObject = stream;
+
+                document.getElementById('startCameraBtn').disabled = true;
+                document.getElementById('captureCameraBtn').disabled = false;
+                document.getElementById('stopCameraBtn').disabled = false;
+
+                statusEl.textContent = '✓ Camera ready - Click Capture to take photo';
+                statusEl.className = 'success';
+            } catch (error) {
+                document.getElementById('camera-status').textContent = '❌ ' + error.message;
+                console.error('Camera error:', error);
+            }
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('camera-video');
+            const canvas = document.getElementById('camera-canvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+
+            const photoUrl = canvas.toDataURL('image/jpeg', 0.8);
+            capturedPhotoData = photoUrl;
+
+            const photoPreview = document.getElementById('photo-preview');
+            const capturedPhoto = document.getElementById('captured-photo');
+            capturedPhoto.src = photoUrl;
+            photoPreview.style.display = 'block';
+
+            document.getElementById('camera-status').textContent = '✓ Photo captured successfully!';
+            document.getElementById('camera-status').className = 'success';
+
+            stopCamera();
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+
+            const video = document.getElementById('camera-video');
+            video.srcObject = null;
+
+            document.getElementById('startCameraBtn').disabled = false;
+            document.getElementById('captureCameraBtn').disabled = true;
+            document.getElementById('stopCameraBtn').disabled = true;
+        }
+
+        function removePhoto() {
+            capturedPhotoData = null;
+            document.getElementById('photo-preview').style.display = 'none';
+            document.getElementById('camera-status').textContent = '';
+            document.getElementById('camera-status').className = '';
+            document.getElementById('startCameraBtn').disabled = false;
+        }
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = {
+                visitor_name: document.getElementById('visitor_name').value,
+                visitor_email: document.getElementById('visitor_email').value,
+                reason: document.getElementById('reason').value,
+                approver_name: document.getElementById('approver_name').value,
+                photo_data: capturedPhotoData
+            };
+            
+            // Validation
+            if (!formData.visitor_name || !formData.visitor_email || !formData.reason || !formData.approver_name) {
+                showError('Please fill in all fields');
+                return;
+            }
+
+            if (!capturedPhotoData) {
+                showError('Please capture a photo before submitting');
+                return;
+            }
+            
+            // Show loading
+            form.style.display = 'none';
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+            loading.style.display = 'block';
+            
+            try {
+                // Send request
+                const response = await fetch('/request-access', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    loading.style.display = 'none';
+                    successMessage.style.display = 'block';
+                    
+                    // Display request ID
+                    requestIdDisplay.textContent = result.request_id;
+                    
+                    // Make request ID copyable
+                    requestIdDisplay.addEventListener('click', () => {
+                        navigator.clipboard.writeText(result.request_id).then(() => {
+                            const originalText = requestIdDisplay.textContent;
+                            requestIdDisplay.textContent = '✓ Copied!';
+                            setTimeout(() => {
+                                requestIdDisplay.textContent = originalText;
+                            }, 2000);
+                        });
+                    });
+                    
+                    form.reset();
+                    capturedPhotoData = null;
+                    document.getElementById('photo-preview').style.display = 'none';
+                    
+                    // Auto-redirect to status check after 3 seconds
+                    setTimeout(() => {
+                        window.location.href = `/check-status/${result.request_id}`;
+                    }, 3000);
+                } else {
+                    showError(result.message);
+                }
+            } catch (error) {
+                showError('Error: ' + error.message);
+            }
+        });
+        
+        function showError(message) {
+            loading.style.display = 'none';
+            form.style.display = 'block';
+            errorMessage.textContent = '❌ ' + message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

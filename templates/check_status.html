@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Request Status</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 550px;
+            width: 100%;
+            padding: 40px 30px;
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #f0f0f0;
+        }
+
+        .header-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: inline-block;
+            animation: fadeInScale 0.6s ease;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #999;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            animation: slideUp 0.6s ease 0.1s both;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+            background: #f9f9f9;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input::placeholder {
+            color: #bbb;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            animation: slideUp 0.6s ease 0.2s both;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-check {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-check:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-check:active {
+            transform: translateY(0);
+        }
+
+        .btn-back {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-back:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        /* Status Display */
+        .status-container {
+            margin-top: 30px;
+            display: none;
+            animation: fadeInScale 0.6s ease;
+        }
+
+        .status-container.show {
+            display: block;
+        }
+
+        .status-card {
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f3ff 100%);
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            font-size: 14px;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 700;
+            color: #667eea;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 12px;
+        }
+
+        .status-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+        }
+
+        .status-badge.pending {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%);
+            color: #856404;
+            animation: pulse 2s infinite;
+        }
+
+        .status-badge.approved {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            animation: bounce 0.6s ease;
+        }
+
+        .status-badge.rejected {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        @keyframes bounce {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #dc3545;
+            margin-top: 20px;
+            display: none;
+            animation: slideUp 0.6s ease;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .help-text {
+            color: #999;
+            font-size: 12px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .status-card {
+                padding: 20px;
+            }
+
+            .status-item {
+                font-size: 13px;
+            }
+
+            .status-label {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">🔍</div>
+            <h1>Check Status</h1>
+            <p>Track your access request in real-time</p>
+        </div>
+
+        <div class="form-group">
+            <label for="request-id">Request ID</label>
+            <input 
+                type="text" 
+                id="request-id" 
+                placeholder="Enter your unique request ID"
+                autocomplete="off"
+            >
+            <div class="help-text">
+                💡 You received this ID via email when you submitted your request.
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-check" onclick="checkStatus()">Check Status</button>
+            <button class="btn-back" onclick="goBack()">Back</button>
+        </div>
+
+        <div class="error-message" id="error-message"></div>
+
+        <div class="status-container" id="status-container">
+            <div class="status-card">
+                <div class="status-item">
+                    <span class="status-label">Visitor Name</span>
+                    <span class="status-value" id="visitor-name">-</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Approver</span>
+                    <span class="status-value" id="approver-name">-</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Submitted At</span>
+                    <span class="status-value" id="timestamp">-</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Current Status</span>
+                    <div>
+                        <div class="status-badge" id="status-badge">
+                            <span class="spinner" id="spinner"></span>
+                            <span id="status-text">Pending</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function checkStatus() {
+            const requestId = document.getElementById('request-id').value.trim();
+            const errorMsg = document.getElementById('error-message');
+            const statusContainer = document.getElementById('status-container');
+
+            errorMsg.classList.remove('show');
+            statusContainer.classList.remove('show');
+
+            if (!requestId) {
+                errorMsg.textContent = '❌ Please enter your request ID';
+                errorMsg.classList.add('show');
+                return;
+            }
+
+            // Show loading state
+            statusContainer.classList.add('show');
+            document.getElementById('spinner').style.display = 'inline-block';
+            document.getElementById('status-text').textContent = 'Loading...';
+
+            // Fetch status from server
+            fetch(`/api/check-status/${requestId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayStatus(data);
+                    } else {
+                        errorMsg.textContent = '❌ ' + (data.message || 'Request not found');
+                        errorMsg.classList.add('show');
+                        statusContainer.classList.remove('show');
+                    }
+                })
+                .catch(error => {
+                    errorMsg.textContent = '❌ Error checking status. Please try again.';
+                    errorMsg.classList.add('show');
+                    statusContainer.classList.remove('show');
+                    console.error('Error:', error);
+                });
+        }
+
+        function displayStatus(data) {
+            const badge = document.getElementById('status-badge');
+            const spinner = document.getElementById('spinner');
+            const statusText = document.getElementById('status-text');
+            const statusMap = {
+                'pending': '⏳ Pending',
+                'approved': '✅ Approved',
+                'rejected': '❌ Rejected'
+            };
+
+            // Update badge
+            badge.className = 'status-badge ' + data.status;
+
+            if (data.status === 'pending') {
+                spinner.style.display = 'inline-block';
+                statusText.textContent = 'Pending Approval';
+            } else {
+                spinner.style.display = 'none';
+                statusText.textContent = statusMap[data.status] || data.status;
+            }
+
+            // Update details
+            document.getElementById('visitor-name').textContent = data.visitor_name;
+            document.getElementById('approver-name').textContent = data.approver_name;
+            document.getElementById('timestamp').textContent = new Date(data.timestamp).toLocaleString();
+
+            // Show celebration for approved
+            if (data.status === 'approved') {
+                playSuccessSound();
+                createConfetti();
+            }
+        }
+
+        function goBack() {
+            window.location.href = '/';
+        }
+
+        // Confetti animation
+        function createConfetti() {
+            const colors = ['#667eea', '#764ba2', '#28a745', '#ffc107'];
+            const confettiCount = 40;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = confetti.style.width;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * window.innerWidth + 'px';
+                confetti.style.top = '-10px';
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                confetti.style.pointerEvents = 'none';
+                confetti.style.zIndex = '1000';
+                confetti.style.animation = `fall ${2 + Math.random() * 2}s linear forwards`;
+                
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => confetti.remove(), 4000);
+            }
+        }
+
+        // Add CSS animation for confetti
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes fall {
+                to {
+                    transform: translateY(100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        function playSuccessSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const notes = [800, 1000, 1200];
+                let delay = 0;
+
+                notes.forEach(freq => {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.3, audioContext.currentTime + delay);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + delay + 0.2);
+                    
+                    osc.start(audioContext.currentTime + delay);
+                    osc.stop(audioContext.currentTime + delay + 0.2);
+                    
+                    delay += 0.1;
+                });
+            } catch (e) {
+                console.log('Sound not available');
+            }
+        }
+
+        // Allow Enter key to check status
+        document.getElementById('request-id').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkStatus();
+            }
+        });
+    </script>
+</body>
+</html>

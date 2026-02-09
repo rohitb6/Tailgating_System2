@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 15px;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 25px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .header-info h1 {
+            color: #333;
+            font-size: 28px;
+            margin: 0 0 8px 0;
+            font-weight: 700;
+        }
+        
+        .header-info p {
+            color: #999;
+            font-size: 13px;
+            margin: 0;
+            font-weight: 500;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        a.btn {
+            padding: 11px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+        }
+        
+        a.btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        a.btn:active {
+            transform: translateY(0);
+        }
+        
+        a.btn.refresh-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        
+        a.btn.refresh-btn:hover {
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            a.btn {
+                flex: none;
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                margin: 0;
+            }
+            
+            .header {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .header h1 {
+                font-size: 18px;
+            }
+            
+            .header p {
+                font-size: 12px;
+            }
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: slideUp 0.5s ease 0.2s both;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-bottom: 2px solid #667eea;
+        }
+        
+        th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 700;
+            color: white;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #e8e8e8;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        tbody tr:hover {
+            background: #f8f9ff;
+            transition: background 0.2s ease;
+        }
+        
+        tbody tr {
+            transition: all 0.2s ease;
+        }
+        
+        strong {
+            color: #333;
+            font-weight: 700;
+        }
+        
+        @media (max-width: 768px) {
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 12px 8px;
+                font-size: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            table {
+                min-width: 600px;
+                font-size: 11px;
+            }
+            
+            th, td {
+                padding: 10px 6px;
+                font-size: 11px;
+            }
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+        
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffc107;
+        }
+        
+        .status.approved {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #28a745;
+        }
+        
+        .status.rejected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #dc3545;
+        }
+        
+        .empty-state {
+            padding: 60px 40px;
+            text-align: center;
+            color: #999;
+        }
+        
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .empty-state p:first-child {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+            
+            .stat-card {
+                padding: 15px;
+            }
+            
+            .stat-number {
+                font-size: 24px;
+            }
+            
+            .stat-label {
+                font-size: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .refresh-btn {
+            background: #28a745;
+        }
+        
+        .refresh-btn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-top">
+                <div class="header-info">
+                    <h1>📊 Access Management</h1>
+                    <p>Real-time Approval Dashboard</p>
+                </div>
+                <div class="button-group">
+                    <a href="/" class="btn">✅ New Request</a>
+                    <a href="javascript:location.reload()" class="btn refresh-btn">🔄 Refresh</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">📊 Total Requests</div>
+                <div class="stat-number" id="total">{{ requests|length }}</div>
+            </div>
+            <div class="stat-card approved">
+                <div class="stat-label">✅ Approved</div>
+                <div class="stat-number" id="approved">0</div>
+            </div>
+            <div class="stat-card rejected">
+                <div class="stat-label">❌ Rejected</div>
+                <div class="stat-number" id="rejected">0</div>
+            </div>
+            <div class="stat-card pending">
+                <div class="stat-label">⏳ Pending</div>
+                <div class="stat-number" id="pending">0</div>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Visitor Name</th>
+                        <th>Approver</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody id="requestsBody">
+                    {% if requests %}
+                        {% for req in requests %}
+                        <tr>
+                            <td><strong>{{ req.visitor }}</strong></td>
+                            <td>{{ req.approver }}</td>
+                            <td>{{ req.reason }}</td>
+                            <td>
+                                <span class="status {{ req.status }}">
+                                    {% if req.status == 'approved' %}✅ Approved
+                                    {% elif req.status == 'rejected' %}❌ Rejected
+                                    {% else %}⏳ Pending
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>{{ req.time }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <p>📭 No access requests yet</p>
+                                <a href="/" class="btn">Create First Request</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        // Calculate statistics
+        function updateStats() {
+            const rows = document.querySelectorAll('tbody tr');
+            let approved = 0, rejected = 0, pending = 0;
+            
+            rows.forEach(row => {
+                const statusCell = row.querySelector('.status');
+                if (statusCell) {
+                    if (statusCell.classList.contains('approved')) approved++;
+                    else if (statusCell.classList.contains('rejected')) rejected++;
+                    else if (statusCell.classList.contains('pending')) pending++;
+                }
+            });
+            
+            document.getElementById('approved').textContent = approved;
+            document.getElementById('rejected').textContent = rejected;
+            document.getElementById('pending').textContent = pending;
+        }
+        
+        // Update on page load
+        window.addEventListener('load', updateStats);
+        
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            location.reload();
+        }, 30000);
+    </script>
+</body>
+</html>
