@@ -10,13 +10,21 @@ from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 import secrets
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-change-this'
+app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-change-this')
+
+# Get deployment URL
+DEPLOYMENT_URL = os.getenv('DEPLOYMENT_URL', 'http://localhost:5000')
+FLASK_ENV = os.getenv('FLASK_ENV', 'development')
 
 # Authorized approvers with email addresses
 AUTHORIZED_APPROVERS = {
@@ -26,11 +34,11 @@ AUTHORIZED_APPROVERS = {
     "Lisa HR": "lisa@company.com"
 }
 
-# Email configuration (update with your SMTP details)
-SMTP_SERVER = "smtp.gmail.com"  # Change for your email provider
-SMTP_PORT = 587
-SENDER_EMAIL = "loginai760@gmail.com"  # Your email - UPDATE THIS
-SENDER_PASSWORD = "owikzupqgabcfoqb"  # Your app password - UPDATE THIS
+# Email configuration (from environment variables)
+SMTP_SERVER = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
+SMTP_PORT = int(os.getenv('SMTP_PORT', 587))
+SENDER_EMAIL = os.getenv('SENDER_EMAIL', '')
+SENDER_PASSWORD = os.getenv('SENDER_PASSWORD', '')
 
 # In-memory storage for access requests (use database in production)
 access_requests = {}
@@ -45,9 +53,9 @@ def send_approval_email(visitor_name, visitor_reason, approver_name, approver_em
     Send email to approver with approval/rejection links
     """
     try:
-        # Create unique approval and rejection links
-        approval_link = f"http://localhost:5000/approve/{approval_token}?action=approve"
-        rejection_link = f"http://localhost:5000/approve/{approval_token}?action=reject"
+        # Create unique approval and rejection links with deployment URL
+        approval_link = f"{DEPLOYMENT_URL}/approve/{approval_token}?action=approve"
+        rejection_link = f"{DEPLOYMENT_URL}/approve/{approval_token}?action=reject"
         
         # Create email message
         msg = MIMEMultipart('alternative')
@@ -292,9 +300,16 @@ if __name__ == '__main__':
     print("\n" + "="*60)
     print("Gate Entry Approval System - Web Interface")
     print("="*60)
+    print(f"Environment: {FLASK_ENV}")
     print("Starting Flask application...")
-    print("Visit: http://localhost:5000")
-    print("\n⚠️  IMPORTANT: Configure email settings in app.py first!")
+    if FLASK_ENV == 'development':
+        print("Visit: http://localhost:5000")
+        print("\n⚠️  IMPORTANT: Configure email settings in .env file!")
     print("="*60 + "\n")
     
-    app.run(debug=True, port=5000)
+    # Get port from environment variable or default to 5000
+    port = int(os.getenv('PORT', 5000))
+    debug_mode = FLASK_ENV == 'development'
+    
+    app.run(debug=debug_mode, port=port, host='0.0.0.0')
+
